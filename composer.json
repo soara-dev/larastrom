@@ -1,0 +1,21 @@
+{
+    "name": "soara/larastrom",
+    "type": "package",
+    "autoload": {
+        "psr-4": {
+            "Soara\\Larastrom\\": "src/"
+        },
+        "files": [
+            "src/Helpers/response.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Harithya Wisesa",
+            "email": "harithya77@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+    
+}
