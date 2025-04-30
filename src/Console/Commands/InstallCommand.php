@@ -13,8 +13,6 @@ class InstallCommand extends Command
 
     protected $description = 'Installs JWT and Spatie Permissions with migrations, routes, and controllers.';
 
-    protected $withConfirmation = true;
-
     public function handle()
     {
         $this->info('Starting full installation process...');
@@ -61,19 +59,14 @@ class InstallCommand extends Command
 
     protected function installSpatiePermissions()
     {
-        if ($this->confirm('Do you want to install Spatie Permissions?')) {
-            $this->info('Installing Spatie Permissions package...');
-            $this->runProcess(['composer', 'require', 'spatie/laravel-permission']);
-            $this->publishVendorConfig('Spatie\Permission\PermissionServiceProvider');
-            Artisan::call('migrate');
-            $this->info('Spatie Permissions migrations completed.');
+        $this->info('Installing Spatie Permissions package...');
+        $this->runProcess(['composer', 'require', 'spatie/laravel-permission']);
+        $this->publishVendorConfig('Spatie\Permission\PermissionServiceProvider');
+        Artisan::call('migrate');
+        $this->info('Spatie Permissions migrations completed.');
 
-            $this->addSpatieRoutes();
-            $this->addSpatieController();
-        } else {
-            $this->info('Skipping Spatie Permissions installation...');
-            $this->withConfirmation = false;
-        }
+        $this->addSpatieRoutes();
+        $this->addSpatieController();
     }
 
     protected function runProcess(array $command)
@@ -282,11 +275,7 @@ class InstallCommand extends Command
             File::makeDirectory($directoryPath, 0755, true);
         }
         if (!File::exists($controllerPath)) {
-            if ($this->withConfirmation) {
-                $controllerContent = file_get_contents(realpath(__DIR__ . '/../../../stub/AuthController.stub'));
-            } else {
-                $controllerContent = file_get_contents(realpath(__DIR__ . '/../../../stub/AuthCOntrollerWihoutPermission.stub'));
-            }
+            $controllerContent = file_get_contents(realpath(__DIR__ . '/../../../stub/AuthController.stub'));
 
             File::put($controllerPath, $controllerContent);
             $this->info('JWT Auth controller added.');
