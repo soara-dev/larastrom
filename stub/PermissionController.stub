@@ -10,39 +10,39 @@ class PermissionController extends Controller
 {
     public function index()
     {
-        \$permissions = Permission::allowInteraction()->orderBy('id', 'desc')->fetch();
-        return setResponse('Successfully retrieved all permissions', \$permissions);
+        $permissions = Permission::allowInteraction()->orderBy('id', 'desc')->fetch();
+        return setResponse('Successfully retrieved all permissions', $permissions);
     }
 
-    public function store(Request \$request)
+    public function store(Request $request)
     {
-        \$request->validate([
+        $request->validate([
             'name' => 'required|string|max:255|unique:permissions,name', 
             'guard_name' => 'required|string|max:255
         ']);
-        \$permission = Permission::create(\$request->all());
-        return setResponse('Successfully created permission', \$permission);
+        $permission = Permission::create($request->all());
+        return setResponse('Successfully created permission', $permission);
     }
 
-    public function show(\$id)
+    public function show($id)
     {
-        \$permission = Permission::find(\$id);
-        return setResponse('Successfully retrieved permission', \$permission);
+        $permission = Permission::find($id);
+        return setResponse('Successfully retrieved permission', $permission);
     }
 
-    public function update(Request \$request, \$id)
+    public function update(Request $request, $id)
     {
-        \$request->validate([
-            'name' => 'required|string|max:255|unique:permissions,name,' . \$id, 
+        $request->validate([
+            'name' => 'required|string|max:255|unique:permissions,name,' . $id, 
             'guard_name' => 'required|string|max:255'
         ]);
-        \$permission = Permission::find(\$id)->update(\$request->all());
-        return setResponse('Successfully updated permission', \$permission);
+        $permission = Permission::find($id)->update($request->all());
+        return setResponse('Successfully updated permission', $permission);
     }
 
-    public function destroy(\$id)
+    public function destroy($id)
     {
-        \$permission = Permission::find(\$id)->delete();
-        return setResponse('Successfully deleted permission', \$permission);
+        $permission = Permission::find($id)->delete();
+        return setResponse('Successfully deleted permission', $permission);
     }
 }

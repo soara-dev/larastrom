@@ -39,24 +39,24 @@ class InstallCommand extends Command
 
     protected function addJwtGuardConfiguration()
     {
-        $authConfigPath = config_path('auth.php');
+        // $authConfigPath = config_path('auth.php');
 
-        if (File::exists($authConfigPath)) {
-            $authConfigContent = File::get($authConfigPath);
+        // if (File::exists($authConfigPath)) {
+        //     $authConfigContent = File::get($authConfigPath);
 
-            // Check if the 'api' guard already exists
-            if (strpos($authConfigContent, "'api' => [") === false) {
-                // Add the JWT guard configuration
-                $guardConfig = "\n    'api' => [\n        'driver' => 'jwt',\n        'provider' => 'users',\n    ],\n";
-                $authConfigContent = preg_replace("/'guards' => \[\n/", "'guards' => [\n$guardConfig", $authConfigContent);
-                File::put($authConfigPath, $authConfigContent);
-                $this->info('JWT guard configuration added to config/auth.php.');
-            } else {
-                $this->info('JWT guard configuration already exists in config/auth.php. Skipping addition.');
-            }
-        } else {
-            $this->error('auth.php configuration file not found.');
-        }
+        //     // Check if the 'api' guard already exists
+        //     if (strpos($authConfigContent, "'api' => [") === false) {
+        //         // Add the JWT guard configuration
+        //         $guardConfig = "\n    'api' => [\n        'driver' => 'jwt',\n        'provider' => 'users',\n    ],\n";
+        //         $authConfigContent = preg_replace("/'guards' => \[\n/", "'guards' => [\n$guardConfig", $authConfigContent);
+        //         File::put($authConfigPath, $authConfigContent);
+        //         $this->info('JWT guard configuration added to config/auth.php.');
+        //     } else {
+        //         $this->info('JWT guard configuration already exists in config/auth.php. Skipping addition.');
+        //     }
+        // } else {
+        //     $this->error('auth.php configuration file not found.');
+        // }
     }
 
     protected function installSpatiePermissions()
@@ -115,7 +115,7 @@ class InstallCommand extends Command
             File::makeDirectory($directoryPath, 0755, true);
         }
         if (!File::exists($middlewarePath)) {
-            $middlewareContent = file_get_contents(__DIR__ . '/../../../stubs/JwtVerify.stub');
+            $middlewareContent = file_get_contents(realpath(__DIR__ . '/../../../stub/JwtVerify.stub'));
             File::put($middlewarePath, $middlewareContent);
             $this->registerJwtMiddleware();
             $this->info('JWT Verify middleware added.');
@@ -125,42 +125,42 @@ class InstallCommand extends Command
     }
     protected function registerJwtMiddleware()
     {
-        $appPath = base_path('bootstrap/app.php');
-        $this->checkFileExists($appPath, 'bootstrap/app.php not found.');
+        // $appPath = base_path('bootstrap/app.php');
+        // $this->checkFileExists($appPath, 'bootstrap/app.php not found.');
 
-        $appContent = File::get($appPath);
-        $this->addUseStatement($appContent, "use App\\Http\\Middleware\\JwtVerify;");
-        $this->addMiddlewareAlias($appContent, "'jwt.verify' => JwtVerify::class");
-        File::put($appPath, $appContent);
+        // $appContent = File::get($appPath);
+        // $this->addUseStatement($appContent, "use App\\Http\\Middleware\\JwtVerify;");
+        // $this->addMiddlewareAlias($appContent, "'jwt.verify' => JwtVerify::class");
+        // File::put($appPath, $appContent);
     }
 
     protected function addMiddlewareAlias(&$content, $alias)
     {
-        if (strpos($content, $alias) === false) {
-            $middlewareCode = "\n        \$middleware->alias([\n            $alias,\n        ]);\n";
-            $insertToken = '->withMiddleware(function (Middleware $middleware) {';
-            $insertPosition = strpos($content, $insertToken);
+        // if (strpos($content, $alias) === false) {
+        //     $middlewareCode = "\n        \$middleware->alias([\n            $alias,\n        ]);\n";
+        //     $insertToken = '->withMiddleware(function (Middleware $middleware) {';
+        //     $insertPosition = strpos($content, $insertToken);
 
-            if ($insertPosition !== false) {
-                $insertPosition += strlen($insertToken);
-                $content = substr_replace($content, $middlewareCode, $insertPosition, 0);
-            }
-        }
+        //     if ($insertPosition !== false) {
+        //         $insertPosition += strlen($insertToken);
+        //         $content = substr_replace($content, $middlewareCode, $insertPosition, 0);
+        //     }
+        // }
     }
 
     protected function addApiMiddleware(&$content)
     {
         // Cek apakah pengaturan API sudah ada
-        if (strpos($content, 'api: __DIR__ . \'/../routes/api.php\'') === false) {
-            $apiRoutingCode = ",\n        api: __DIR__ . '/../routes/api.php'";
-            $insertToken = '->withRouting(';
-            $insertPosition = strpos($content, $insertToken);
+        // if (strpos($content, 'api: __DIR__ . \'/../routes/api.php\'') === false) {
+        //     $apiRoutingCode = ",\n        api: __DIR__ . '/../routes/api.php'";
+        //     $insertToken = '->withRouting(';
+        //     $insertPosition = strpos($content, $insertToken);
 
-            if ($insertPosition !== false) {
-                $insertPosition += strlen($insertToken);
-                $content = substr_replace($content, $apiRoutingCode, $insertPosition, 0);
-            }
-        }
+        //     if ($insertPosition !== false) {
+        //         $insertPosition += strlen($insertToken);
+        //         $content = substr_replace($content, $apiRoutingCode, $insertPosition, 0);
+        //     }
+        // }
     }
 
     protected function addUseStatement(&$content, $statement)
@@ -173,14 +173,14 @@ class InstallCommand extends Command
 
     protected function appendSpatieRoutes($routesPath)
     {
-        $routeContent = "\n// Spatie Permissions Routes\n";
-        $routeContent .= "Route::middleware(['jwt.verify'])->group(function () {\n";
-        $routeContent .= "    Route::post('role/{id}/assign-permission', [RoleController::class, 'assignPermission']);\n";
-        $routeContent .= "    Route::apiResource('role', RoleController::class);\n";
-        $routeContent .= "    Route::apiResource('permission', PermissionController::class);\n";
-        $routeContent .= "});\n";
+        // $routeContent = "\n// Spatie Permissions Routes\n";
+        // $routeContent .= "Route::middleware(['jwt.verify'])->group(function () {\n";
+        // $routeContent .= "    Route::post('role/{id}/assign-permission', [RoleController::class, 'assignPermission']);\n";
+        // $routeContent .= "    Route::apiResource('role', RoleController::class);\n";
+        // $routeContent .= "    Route::apiResource('permission', PermissionController::class);\n";
+        // $routeContent .= "});\n";
 
-        File::append($routesPath, $routeContent);
+        // File::append($routesPath, $routeContent);
     }
 
     protected function addSpatieController()
@@ -196,7 +196,7 @@ class InstallCommand extends Command
         $modelPath = app_path('Models/Role.php');
 
         if (!File::exists($modelPath)) {
-            $modelContent = file_get_contents(__DIR__ . '/../../../stubs/Role.stub');
+            $modelContent = file_get_contents(realpath(__DIR__ . '/../../../stub/Role.stub'));
 
             File::put($modelPath, $modelContent);
             $this->info('Role model added.');
@@ -210,7 +210,7 @@ class InstallCommand extends Command
         $modelPath = app_path('Models/Permission.php');
 
         if (!File::exists($modelPath)) {
-            $modelContent = file_get_contents(__DIR__ . '/../../../stubs/Permission.stub');
+            $modelContent = file_get_contents(realpath(__DIR__ . '/../../../stub/Permission.stub'));
 
             File::put($modelPath, $modelContent);
             $this->info('Permission model added.');
@@ -231,7 +231,7 @@ class InstallCommand extends Command
 
         // Cek if role controller already exists
         if (!File::exists($controllerPath)) {
-            $controllerContent = file_get_contents(__DIR__ . '/../../../stubs/RoleController.stub');
+            $controllerContent = file_get_contents(realpath(__DIR__ . '/../../../stub/RoleController.stub'));
 
             File::put($controllerPath, $controllerContent);
             $this->info('Role controller added.');
@@ -250,7 +250,7 @@ class InstallCommand extends Command
         }
 
         if (!File::exists($controllerPath)) {
-            $controllerContent = file_get_contents(__DIR__ . '/../../../stubs/PermissionController.stub');
+            $controllerContent = file_get_contents(realpath(__DIR__ . '/../../../stub/PermissionController.stub'));
 
             File::put($controllerPath, $controllerContent);
             $this->info('Permission controller added.');
@@ -268,7 +268,7 @@ class InstallCommand extends Command
 
     protected function appendJwtRoutes($routesPath)
     {
-        $routeContent = file_get_contents(__DIR__ . '/../../../stubs/RouteContent.stub');
+        $routeContent = file_get_contents(realpath(__DIR__ . '/../../../stub/RouteContent.stub'));
         File::append($routesPath, $routeContent);
         $this->info('JWT authentication routes added.');
     }
@@ -283,9 +283,9 @@ class InstallCommand extends Command
         }
         if (!File::exists($controllerPath)) {
             if ($this->withConfirmation) {
-                $controllerContent = file_get_contents(__DIR__ . '/../../../stubs/AuthController.stub');
+                $controllerContent = file_get_contents(realpath(__DIR__ . '/../../../stub/AuthController.stub'));
             } else {
-                $controllerContent = file_get_contents(__DIR__ . '/../../../stubs/AuthCOntrollerWihoutPermission.stub');
+                $controllerContent = file_get_contents(realpath(__DIR__ . '/../../../stub/AuthCOntrollerWihoutPermission.stub'));
             }
 
             File::put($controllerPath, $controllerContent);

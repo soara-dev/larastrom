@@ -9,47 +9,47 @@ class RoleController extends Controller
 {
     public function index()
     {
-        \$roles = Role::allowInteraction()->orderBy('id', 'desc')->fetch();
-        return setResponse('Successfully retrieved all roles', \$roles);
+        $roles = Role::allowInteraction()->orderBy('id', 'desc')->fetch();
+        return setResponse('Successfully retrieved all roles', $roles);
     }
 
-    public function store(Request \$request)
+    public function store(Request $request)
     {
-        \$request->validate([
+        $request->validate([
             'name' => 'required|string|max:255|unique:roles,name', 
             'guard_name' => 'required|string|max:255
         ']);
-        \$role = Role::create(\$request->all());
-        return setResponse('Successfully created role', \$role);
+        $role = Role::create($request->all());
+        return setResponse('Successfully created role', $role);
     }
 
-    public function show(\$id)
+    public function show($id)
     {
-        \$role = Role::with('permissions')->find(\$id);
-        return setResponse('Successfully retrieved role', \$role);
+        $role = Role::with('permissions')->find($id);
+        return setResponse('Successfully retrieved role', $role);
     }
 
-    public function update(Request \$request, \$id)
+    public function update(Request $request, $id)
     {
-        \$request->validate([
-            'name' => 'required|string|max:255|unique:roles,name,' . \$id, 
+        $request->validate([
+            'name' => 'required|string|max:255|unique:roles,name,' . $id, 
             'guard_name' => 'required|string|max:255'
         ]);
-        \$role = Role::find(\$id)->update(\$request->all());
-        return setResponse('Successfully updated role', \$role);
+        $role = Role::find($id)->update($request->all());
+        return setResponse('Successfully updated role', $role);
     }
 
-    public function destroy(\$id)
+    public function destroy($id)
     {
-        \$role = Role::destroy(\$id);
-        return setResponse('Successfully deleted role', \$role);
+        $role = Role::destroy($id);
+        return setResponse('Successfully deleted role', $role);
     }
 
-    public function assignPermission(Request \$request, \$id)
+    public function assignPermission(Request $request, $id)
     {
-        \$role = Role::with('permissions')->find(\$id);
-        \$permissions = array_keys(array_filter(\$request->permissions, fn(\$value) => \$value === true));
-        \$role->syncPermissions(\$permissions);
-        return setResponse('Successfully assigned permission to role', \$role);
+        $role = Role::with('permissions')->find($id);
+        $permissions = array_keys(array_filter($request->permissions, fn($value) => $value === true));
+        $role->syncPermissions($permissions);
+        return setResponse('Successfully assigned permission to role', $role);
     }
 }
