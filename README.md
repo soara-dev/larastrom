@@ -94,3 +94,7 @@ Or shorthand:
 ```php
 $user = User::allowInteraction()->fetch();
 ```
+
+## License
+
+This package is open source and released under the [MIT License](https://opensource.org/licenses/MIT).
