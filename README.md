@@ -23,3 +23,74 @@ Larastrom is a developer-friendly Laravel package that speeds up and simplifies 
 ```
 composer require soara/larastrom
 ```
+
+## Usage
+
+- [JWT Authentication](#jwt-authentication)
+- [Response Format](#response-format)
+- [Model Builder](#model-builder)
+
+### JWT Authentication
+
+```php
+Route::post('/login', [AuthController::class, 'login']);
+```
+
+### Response Format
+
+To return a successful response from your controller, use the following format:
+
+```php
+return setResponse('Get data successfully', $data); // 200 = OK
+
+return setResponse('Opps something wrong', [], 500); // 500 = Internal Server Error
+```
+
+### Model Builder
+
+Model Builder can provide a simple pagination, sorting and searching functionality for your database models.
+
+```js
+const req = axios.get('/users', {
+    params: {
+        pageSize: 10, // if you want to use pagination
+        searchField: { // if you want to use searching
+            name: 'john',
+            ...
+        },
+        sortField: { // if you want to use sorting
+            created_at: 'desc',
+            ...
+        }
+    }
+})
+```
+
+In your model add traits:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Soara\Larastrom\Traits\WithBuilder; // add this line
+
+
+class User extends Model
+{
+    use WithBuilder; // add this line
+}
+```
+
+implement in your controller:
+
+```php
+$user = User::allowSearch()->allowOrder()->fetch();
+```
+
+Or shorthand:
+
+```php
+$user = User::allowInteraction()->fetch();
+```
