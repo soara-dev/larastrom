@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\Process;
 class InstallCommand extends Command
 {
     protected $signature = 'larastrom:install-auth';
+
     protected $description = 'Installs JWT and Spatie Permissions with migrations, routes, and controllers.';
+
+    protected $withConfirmation = true;
 
     public function handle()
     {
@@ -69,6 +72,7 @@ class InstallCommand extends Command
             $this->addSpatieController();
         } else {
             $this->info('Skipping Spatie Permissions installation...');
+            $this->withConfirmation = true;
         }
     }
 
@@ -107,53 +111,11 @@ class InstallCommand extends Command
         $middlewarePath = app_path('Http/Middleware/JwtVerify.php');
         $directoryPath = dirname($middlewarePath);
 
-        // Cek apakah direktori ada, jika tidak, buat direktori
         if (!File::exists($directoryPath)) {
             File::makeDirectory($directoryPath, 0755, true);
         }
         if (!File::exists($middlewarePath)) {
-            $middlewareContent = <<<PHP
-            <?php
-
-            namespace App\Http\Middleware;
-
-            use Closure;
-            use Illuminate\Http\Request;
-            use Symfony\Component\HttpFoundation\Response;
-            use Tymon\JWTAuth\Facades\JWTAuth;
-            use Exception;
-
-            class JwtVerify
-            {
-                /**
-                 * Handle an incoming request.
-                 *
-                 * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  \$next
-                 */
-                public function handle(Request \$request, Closure \$next): Response
-                {
-                    try {
-                        \$user = JWTAuth::parseToken()->authenticate();
-                    } catch (Exception \$e) {
-                        if (\$e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
-                            return response()->json(['message' => 'Token is Invalid'], 401);
-                        } else if (\$e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
-                            // handle token expired
-                            if (\$request->url() == url('api/auth/refresh')) {
-                                return \$next(\$request);
-                            }
-                            return response()->json(['message' => 'Token is Expired'], 401);
-                        } else if (\$e instanceof \Tymon\JWTAuth\Exceptions\TokenBlacklistedException) {
-                            return response()->json(['message' => 'Token is Blacklisted'], 401);
-                        } else {
-                            return response()->json(['message' => 'Authorization Token not found'], 401);
-                        }
-                    }
-                    return \$next(\$request);
-                }
-            }
-            PHP;
-
+            $middlewareContent = file_get_contents(__DIR__ . '/stubs/JwtVerify.stub');
             File::put($middlewarePath, $middlewareContent);
             $this->registerJwtMiddleware();
             $this->info('JWT Verify middleware added.');
@@ -234,25 +196,7 @@ class InstallCommand extends Command
         $modelPath = app_path('Models/Role.php');
 
         if (!File::exists($modelPath)) {
-            $modelContent = <<<PHP
-            <?php
-
-            namespace App\Models;
-
-            use Illuminate\Database\Eloquent\Factories\HasFactory;
-            use Spatie\Permission\Models\Role as RoleModel;
-
-            class Role extends RoleModel
-            {
-                use HasFactory;
-
-                protected \$table = 'roles';
-
-                protected \$guarded = ['id'];
-
-                public \$timestamps = false;
-            }
-            PHP;
+            $modelContent = file_get_contents(__DIR__ . '/stubs/Role.stub');
 
             File::put($modelPath, $modelContent);
             $this->info('Role model added.');
@@ -266,20 +210,7 @@ class InstallCommand extends Command
         $modelPath = app_path('Models/Permission.php');
 
         if (!File::exists($modelPath)) {
-            $modelContent = <<<PHP
-            <?php
-
-            namespace App\Models;
-
-            use Spatie\Permission\Models\Permission as PermissionModel;
-
-            class Permission extends PermissionModel
-            {
-                protected \$table = 'permissions';
-
-                protected \$guarded = ['id'];
-            }
-            PHP;
+            $modelContent = file_get_contents(__DIR__ . '/stubs/Permission.stub');
 
             File::put($modelPath, $modelContent);
             $this->info('Permission model added.');
@@ -293,66 +224,16 @@ class InstallCommand extends Command
         $controllerPath = app_path('Http/Controllers/Api/Role/RoleController.php');
         $directoryPath = dirname($controllerPath);
 
-        // Cek apakah direktori ada, jika tidak, buat direktori
+        // Cek if directory exists
         if (!File::exists($directoryPath)) {
             File::makeDirectory($directoryPath, 0755, true);
         }
 
-        // Cek apakah file controller sudah ada
+        // Cek if role controller already exists
         if (!File::exists($controllerPath)) {
-            $controllerContent = <<<PHP
-            <?php
+            $controllerContent = file_get_contents(__DIR__ . '/stubs/RoleController.stub');
 
-            namespace App\Http\Controllers\Api\Role;
-
-            use Illuminate\Http\Request;
-            use App\Models\Role;
-
-            class RoleController extends Controller
-            {
-                public function index()
-                {
-                    \$roles = Role::allowInteraction()->orderBy('id', 'desc')->fetch();
-                    return setResponse('Successfully retrieved all roles', \$roles);
-                }
-
-                public function store(Request \$request)
-                {
-                    \$request->validate(['name' => 'required|string|max:255|unique:roles,name', 'guard_name' => 'required|string|max:255']);
-                    \$role = Role::create(\$request->all());
-                    return setResponse('Successfully created role', \$role);
-                }
-
-                public function show(\$id)
-                {
-                    \$role = Role::with('permissions')->find(\$id);
-                    return setResponse('Successfully retrieved role', \$role);
-                }
-
-                public function update(Request \$request, \$id)
-                {
-                    \$request->validate(['name' => 'required|string|max:255|unique:roles,name,' . \$id, 'guard_name' => 'required|string|max:255']);
-                    \$role = Role::find(\$id)->update(\$request->all());
-                    return setResponse('Successfully updated role', \$role);
-                }
-
-                public function destroy(\$id)
-                {
-                    \$role = Role::destroy(\$id);
-                    return setResponse('Successfully deleted role', \$role);
-                }
-
-                public function assignPermission(Request \$request, \$id)
-                {
-                    \$role = Role::with('permissions')->find(\$id);
-                    \$permissions = array_keys(array_filter(\$request->permissions, fn(\$value) => \$value === true));
-                    \$role->syncPermissions(\$permissions);
-                    return setResponse('Successfully assigned permission to role', \$role);
-                }
-            }
-            PHP;
-
-            File::put($controllerPath, $controllerContent); // Buat file dengan konten yang ditentukan
+            File::put($controllerPath, $controllerContent);
             $this->info('Role controller added.');
         } else {
             $this->info('Role controller already exists. Skipping creation.');
@@ -369,50 +250,7 @@ class InstallCommand extends Command
         }
 
         if (!File::exists($controllerPath)) {
-            $controllerContent = <<<PHP
-            <?php
-
-            namespace App\Http\Controllers\Api\Permission;
-
-            use App\Http\Controllers\Controller;
-            use App\Models\Permission;
-            use Illuminate\Http\Request;
-
-            class PermissionController extends Controller
-            {
-                public function index()
-                {
-                    \$permissions = Permission::allowInteraction()->orderBy('id', 'desc')->fetch();
-                    return setResponse('Successfully retrieved all permissions', \$permissions);
-                }
-
-                public function store(Request \$request)
-                {
-                    \$request->validate(['name' => 'required|string|max:255|unique:permissions,name', 'guard_name' => 'required|string|max:255']);
-                    \$permission = Permission::create(\$request->all());
-                    return setResponse('Successfully created permission', \$permission);
-                }
-
-                public function show(\$id)
-                {
-                    \$permission = Permission::find(\$id);
-                    return setResponse('Successfully retrieved permission', \$permission);
-                }
-
-                public function update(Request \$request, \$id)
-                {
-                    \$request->validate(['name' => 'required|string|max:255|unique:permissions,name,' . \$id, 'guard_name' => 'required|string|max:255']);
-                    \$permission = Permission::find(\$id)->update(\$request->all());
-                    return setResponse('Successfully updated permission', \$permission);
-                }
-
-                public function destroy(\$id)
-                {
-                    \$permission = Permission::find(\$id)->delete();
-                    return setResponse('Successfully deleted permission', \$permission);
-                }
-            }
-            PHP;
+            $controllerContent = file_get_contents(__DIR__ . '/stubs/PermissionController.stub');
 
             File::put($controllerPath, $controllerContent);
             $this->info('Permission controller added.');
@@ -430,22 +268,7 @@ class InstallCommand extends Command
 
     protected function appendJwtRoutes($routesPath)
     {
-        $routeContent = <<<PHP
-
-        // JWT Authentication Routes
-        use App\Http\Controllers\Api\Auth\AuthController;
-
-        Route::prefix('auth')->group(function () {
-            Route::post('login', [AuthController::class, "login"]);
-            Route::middleware('jwt.verify')->group(function () {
-                Route::post('me', [AuthController::class, "me"]);
-                Route::post('logout', [AuthController::class, "logout"]);
-                Route::post('refresh', [AuthController::class, "refresh"]);
-            });
-        });
-
-        PHP;
-
+        $routeContent = file_get_contents(__DIR__ . '/stubs/RouteContent.stub');
         File::append($routesPath, $routeContent);
         $this->info('JWT authentication routes added.');
     }
@@ -459,57 +282,11 @@ class InstallCommand extends Command
             File::makeDirectory($directoryPath, 0755, true);
         }
         if (!File::exists($controllerPath)) {
-            $controllerContent = <<<PHP
-        <?php
-
-        namespace App\Http\Controllers\Api\Auth;
-
-        use Illuminate\Http\Request;
-        use App\Models\User;
-
-        class AuthController extends Controller
-        {
-            public function login(Request \$request)
-            {
-                \$request->validate(['email' => 'required|email|string|max:255', 'password' => 'required|string|max:255']);
-                \$credentials = \$request->only('email', 'password');
-                if (! \$token = auth()->attempt(\$credentials)) {
-                    return response()->json(['message' => 'Email or password is wrong'], 401);
-                }
-                return \$this->respondWithToken(\$token);
+            if ($this->withConfirmation) {
+                $controllerContent = file_get_contents(__DIR__ . '/stubs/AuthController.stub');
+            } else {
+                $controllerContent = file_get_contents(__DIR__ . '/stubs/AuthCOntrollerWihoutPermission.stub');
             }
-
-            public function me()
-            {
-                return response()->json(['message' => 'Successfully retrieved current user', 'data' => auth()->user()]);
-            }
-
-            public function logout()
-            {
-                auth()-> logout();
-                return response()->json(['message' => 'Successfully logged out']);
-            }
-
-            public function refresh()
-            {
-                return \$this->respondWithToken(auth()->refresh());
-            }
-
-            protected function respondWithToken(\$token)
-            {
-                return response()->json([
-                    'data' => [
-                        'access_token' => \$token,
-                        'token_type' => 'bearer',
-                        'expires_in' => auth()->factory()->getTTL() * 60,
-                        'auth' => auth()->user(),
-                        'permissions' => auth()->user()->getPermissionsViaRoles()
-                    ],
-                    'message' => 'Successfully logged in'
-                ]);
-            }
-        }
-        PHP;
 
             File::put($controllerPath, $controllerContent);
             $this->info('JWT Auth controller added.');
