@@ -16,7 +16,10 @@
             "email": "harithya77@gmail.com"
         }
     ],
+    "require": {
+        "php": "^8.2"
+    },
     "minimum-stability": "dev",
-    "require": {}
-    
+    "prefer-stable": true
+
 }
