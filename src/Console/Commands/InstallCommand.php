@@ -72,7 +72,7 @@ class InstallCommand extends Command
             $this->addSpatieController();
         } else {
             $this->info('Skipping Spatie Permissions installation...');
-            $this->withConfirmation = true;
+            $this->withConfirmation = false;
         }
     }
 
