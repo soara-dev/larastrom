@@ -169,32 +169,7 @@ class InstallCommand extends Command
         $appContent = File::get($appPath);
         $this->addUseStatement($appContent, "use App\\Http\\Middleware\\JwtVerify;");
         $this->addMiddlewareAlias($appContent, "'jwt.verify' => JwtVerify::class");
-        $this->addApiMiddleware($appContent, "'jwt.verify' => JwtVerify::class");
         File::put($appPath, $appContent);
-    }
-
-    protected function addApiMiddleware(&$content, $alias)
-    {
-        // Cek apakah alias sudah ada
-        if (strpos($content, $alias) === false) {
-            $apiMiddlewareCode = "\n        \$middleware->alias([\n            $alias,\n        ]);\n";
-            $insertToken = '->withRouting(';
-            $insertPosition = strpos($content, $insertToken);
-
-            if ($insertPosition !== false) {
-                // Menemukan posisi untuk menambahkan middleware ke routing API
-                $insertPosition += strlen($insertToken);
-                $content = substr_replace($content, $apiMiddlewareCode, $insertPosition, 0);
-            }
-        }
-    }
-
-    protected function addUseStatement(&$content, $statement)
-    {
-        if (strpos($content, $statement) === false) {
-            $pos = strpos($content, "<?php") + strlen("<?php");
-            $content = substr_replace($content, "\n\n$statement", $pos, 0);
-        }
     }
 
     protected function addMiddlewareAlias(&$content, $alias)
@@ -208,6 +183,29 @@ class InstallCommand extends Command
                 $insertPosition += strlen($insertToken);
                 $content = substr_replace($content, $middlewareCode, $insertPosition, 0);
             }
+        }
+    }
+
+    protected function addApiMiddleware(&$content)
+    {
+        // Cek apakah pengaturan API sudah ada
+        if (strpos($content, 'api: __DIR__ . \'/../routes/api.php\'') === false) {
+            $apiRoutingCode = ",\n        api: __DIR__ . '/../routes/api.php'";
+            $insertToken = '->withRouting(';
+            $insertPosition = strpos($content, $insertToken);
+
+            if ($insertPosition !== false) {
+                $insertPosition += strlen($insertToken);
+                $content = substr_replace($content, $apiRoutingCode, $insertPosition, 0);
+            }
+        }
+    }
+
+    protected function addUseStatement(&$content, $statement)
+    {
+        if (strpos($content, $statement) === false) {
+            $pos = strpos($content, "<?php") + strlen("<?php");
+            $content = substr_replace($content, "\n\n$statement", $pos, 0);
         }
     }
 
