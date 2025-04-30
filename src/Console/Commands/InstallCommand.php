@@ -169,7 +169,24 @@ class InstallCommand extends Command
         $appContent = File::get($appPath);
         $this->addUseStatement($appContent, "use App\\Http\\Middleware\\JwtVerify;");
         $this->addMiddlewareAlias($appContent, "'jwt.verify' => JwtVerify::class");
+        $this->addApiMiddleware($appContent, "'jwt.verify' => JwtVerify::class");
         File::put($appPath, $appContent);
+    }
+
+    protected function addApiMiddleware(&$content, $alias)
+    {
+        // Cek apakah alias sudah ada
+        if (strpos($content, $alias) === false) {
+            $apiMiddlewareCode = "\n        \$middleware->alias([\n            $alias,\n        ]);\n";
+            $insertToken = '->withRouting(';
+            $insertPosition = strpos($content, $insertToken);
+
+            if ($insertPosition !== false) {
+                // Menemukan posisi untuk menambahkan middleware ke routing API
+                $insertPosition += strlen($insertToken);
+                $content = substr_replace($content, $apiMiddlewareCode, $insertPosition, 0);
+            }
+        }
     }
 
     protected function addUseStatement(&$content, $statement)
