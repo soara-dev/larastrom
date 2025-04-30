@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Process;
 
 class InstallCommand extends Command
 {
-    protected $signature = 'larastrom:install-auth';
+    protected $signature = 'v';
 
     protected $description = 'Installs JWT and Spatie Permissions with migrations, routes, and controllers.';
 
@@ -115,7 +115,7 @@ class InstallCommand extends Command
             File::makeDirectory($directoryPath, 0755, true);
         }
         if (!File::exists($middlewarePath)) {
-            $middlewareContent = file_get_contents(__DIR__ . '/stubs/JwtVerify.stub');
+            $middlewareContent = file_get_contents(__DIR__ . '../../../stubs/JwtVerify.stub');
             File::put($middlewarePath, $middlewareContent);
             $this->registerJwtMiddleware();
             $this->info('JWT Verify middleware added.');
@@ -196,7 +196,7 @@ class InstallCommand extends Command
         $modelPath = app_path('Models/Role.php');
 
         if (!File::exists($modelPath)) {
-            $modelContent = file_get_contents(__DIR__ . '/stubs/Role.stub');
+            $modelContent = file_get_contents(__DIR__ . '../../../stubs/Role.stub');
 
             File::put($modelPath, $modelContent);
             $this->info('Role model added.');
@@ -210,7 +210,7 @@ class InstallCommand extends Command
         $modelPath = app_path('Models/Permission.php');
 
         if (!File::exists($modelPath)) {
-            $modelContent = file_get_contents(__DIR__ . '/stubs/Permission.stub');
+            $modelContent = file_get_contents(__DIR__ . '../../../stubs/Permission.stub');
 
             File::put($modelPath, $modelContent);
             $this->info('Permission model added.');
@@ -231,7 +231,7 @@ class InstallCommand extends Command
 
         // Cek if role controller already exists
         if (!File::exists($controllerPath)) {
-            $controllerContent = file_get_contents(__DIR__ . '/stubs/RoleController.stub');
+            $controllerContent = file_get_contents(__DIR__ . '../../../stubs/RoleController.stub');
 
             File::put($controllerPath, $controllerContent);
             $this->info('Role controller added.');
@@ -250,7 +250,7 @@ class InstallCommand extends Command
         }
 
         if (!File::exists($controllerPath)) {
-            $controllerContent = file_get_contents(__DIR__ . '/stubs/PermissionController.stub');
+            $controllerContent = file_get_contents(__DIR__ . '../../../stubs/PermissionController.stub');
 
             File::put($controllerPath, $controllerContent);
             $this->info('Permission controller added.');
@@ -268,7 +268,7 @@ class InstallCommand extends Command
 
     protected function appendJwtRoutes($routesPath)
     {
-        $routeContent = file_get_contents(__DIR__ . '/stubs/RouteContent.stub');
+        $routeContent = file_get_contents(__DIR__ . '../../../stubs/RouteContent.stub');
         File::append($routesPath, $routeContent);
         $this->info('JWT authentication routes added.');
     }
@@ -283,9 +283,9 @@ class InstallCommand extends Command
         }
         if (!File::exists($controllerPath)) {
             if ($this->withConfirmation) {
-                $controllerContent = file_get_contents(__DIR__ . '/stubs/AuthController.stub');
+                $controllerContent = file_get_contents(__DIR__ . '../../../stubs/AuthController.stub');
             } else {
-                $controllerContent = file_get_contents(__DIR__ . '/stubs/AuthCOntrollerWihoutPermission.stub');
+                $controllerContent = file_get_contents(__DIR__ . '../../../stubs/AuthCOntrollerWihoutPermission.stub');
             }
 
             File::put($controllerPath, $controllerContent);
