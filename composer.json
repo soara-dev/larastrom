@@ -9,6 +9,7 @@
             "src/Helpers/response.php"
         ]
     },
+    "license": "MIT",
     "authors": [
         {
             "name": "Harithya Wisesa",
