@@ -32,6 +32,7 @@ class InstallCommand extends Command
         $this->addJwtGuardConfiguration();
         $this->addJwtRoutes();
         $this->addJwtController();
+        Artisan::call('jwt:secret');
         $this->info('JWT configuration published.');
     }
 
