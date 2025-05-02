@@ -32,7 +32,6 @@ class InstallCommand extends Command
         $this->addJwtGuardConfiguration();
         $this->addJwtRoutes();
         $this->addJwtController();
-        Artisan::call('jwt:secret');
         $this->info('JWT configuration published.');
     }
 
@@ -65,6 +64,7 @@ class InstallCommand extends Command
         $this->publishVendorConfig('Spatie\Permission\PermissionServiceProvider');
         Artisan::call('migrate');
         $this->info('Spatie Permissions migrations completed.');
+        Artisan::call('jwt:secret');
 
         $this->addSpatieRoutes();
         $this->addSpatieController();
