@@ -78,7 +78,6 @@ class InstallCommand extends Command
         if (!File::exists($middlewarePath)) {
             $middlewareContent = file_get_contents(realpath(__DIR__ . '/../../../stub/JwtVerify.stub'));
             File::put($middlewarePath, $middlewareContent);
-            $this->registerJwtMiddleware();
             $this->info('JWT Verify middleware added.');
         } else {
             $this->info('JWT Verify middleware already exists. Skipping creation.');
