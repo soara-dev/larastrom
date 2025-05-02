@@ -49,7 +49,7 @@ php artisan install:api
 php artisan larastrom:install-auth
 
 # jwt
-php artisan key:generate
+php artisan jwt:secret
 
 # spatie
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
