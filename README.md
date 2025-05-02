@@ -1,5 +1,9 @@
 # All In One Fullstack Tools For Laravel ( Larastrom )
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/stechstudio/laravel-jwt.svg?style=flat-square)](https://packagist.org/packages/soara/larastrom)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+![Build Status](https://img.shields.io/endpoint?url=https://app.chipperci.com/projects/dc325ad7-6039-4345-8e77-828492ba0bf1/status/v2&style=flat-square)
+
 Larastrom is a developer-friendly Laravel package that speeds up and simplifies the process of building RESTful APIs. It includes ready-to-use tools and smart defaults so you can focus on your business logic, not boilerplate code.
 
 ## 🚀 Features
