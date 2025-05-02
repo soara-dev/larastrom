@@ -25,14 +25,14 @@ class LarastromServiceProvider extends ServiceProvider
     {
         // Publikasi file konfigurasi
         $this->publishes([
-            __DIR__.'/../config/jwt.php' => config_path('jwt.php'),
-            __DIR__.'/../config/permission.php' => config_path('permission.php'),
+            __DIR__ . '/../../config/jwt.php' => config_path('jwt.php'),
+            __DIR__ . '/../../config/permission.php' => config_path('permission.php'),
         ], 'config');
 
         // Menambahkan migration Spatie jika diperlukan
         if (class_exists('Spatie\Permission\PermissionServiceProvider')) {
             $this->publishes([
-                __DIR__.'/../database/migrations' => database_path('migrations'),
+                __DIR__ . '/../database/migrations' => database_path('migrations'),
             ], 'migrations');
         }
     }

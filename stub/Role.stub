@@ -11,7 +11,7 @@ class Role extends RoleModel
 
     protected $table = 'roles';
 
-    protected \$guarded = ['id'];
+    protected $guarded = ['id'];
 
     public $timestamps = false;
 }
