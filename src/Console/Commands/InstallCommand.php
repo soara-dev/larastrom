@@ -101,20 +101,20 @@ class InstallCommand extends Command
     }
     protected function addJwtMiddleware()
     {
-        // $middlewarePath = app_path('Http/Middleware/JwtVerify.php');
-        // $directoryPath = dirname($middlewarePath);
+        $middlewarePath = app_path('Http/Middleware/JwtVerify.php');
+        $directoryPath = dirname($middlewarePath);
 
-        // if (!File::exists($directoryPath)) {
-        //     File::makeDirectory($directoryPath, 0755, true);
-        // }
-        // if (!File::exists($middlewarePath)) {
-        //     $middlewareContent = file_get_contents(realpath(__DIR__ . '/../../../stub/JwtVerify.stub'));
-        //     File::put($middlewarePath, $middlewareContent);
-        //     $this->registerJwtMiddleware();
-        //     $this->info('JWT Verify middleware added.');
-        // } else {
-        //     $this->info('JWT Verify middleware already exists. Skipping creation.');
-        // }
+        if (!File::exists($directoryPath)) {
+            File::makeDirectory($directoryPath, 0755, true);
+        }
+        if (!File::exists($middlewarePath)) {
+            $middlewareContent = file_get_contents(realpath(__DIR__ . '/../../../stub/JwtVerify.stub'));
+            File::put($middlewarePath, $middlewareContent);
+            $this->registerJwtMiddleware();
+            $this->info('JWT Verify middleware added.');
+        } else {
+            $this->info('JWT Verify middleware already exists. Skipping creation.');
+        }
     }
     protected function registerJwtMiddleware()
     {
