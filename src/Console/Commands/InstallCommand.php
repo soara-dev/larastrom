@@ -64,8 +64,6 @@ class InstallCommand extends Command
         $this->publishVendorConfig('Spatie\Permission\PermissionServiceProvider');
         Artisan::call('migrate');
         $this->info('Spatie Permissions migrations completed.');
-        Artisan::call('jwt:secret');
-
         $this->addSpatieRoutes();
         $this->addSpatieController();
     }

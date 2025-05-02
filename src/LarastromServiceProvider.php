@@ -16,6 +16,7 @@ class LarastromServiceProvider extends ServiceProvider
         $this->commands([
             InstallCommand::class,
         ]);
+        $this->register(Tymon\JWTAuth\Providers\LaravelServiceProvider::class);
     }
 
     /**
