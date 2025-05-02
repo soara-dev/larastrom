@@ -158,10 +158,10 @@ class InstallCommand extends Command
 
     protected function addUseStatement(&$content, $statement)
     {
-        if (strpos($content, $statement) === false) {
-            $pos = strpos($content, "<?php") + strlen("<?php");
-            $content = substr_replace($content, "\n\n$statement", $pos, 0);
-        }
+        // if (strpos($content, $statement) === false) {
+        //     $pos = strpos($content, "<?php") + strlen("<?php");
+        //     $content = substr_replace($content, "\n\n$statement", $pos, 0);
+        // }
     }
 
     protected function appendSpatieRoutes($routesPath)
