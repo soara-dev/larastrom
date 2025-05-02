@@ -261,9 +261,9 @@ class InstallCommand extends Command
 
     protected function appendJwtRoutes($routesPath)
     {
-        $routeContent = file_get_contents(realpath(__DIR__ . '/../../../stub/RouteContent.stub'));
-        File::append($routesPath, $routeContent);
-        $this->info('JWT authentication routes added.');
+        // $routeContent = file_get_contents(realpath(__DIR__ . '/../../../stub/RouteContent.stub'));
+        // File::append($routesPath, $routeContent);
+        // $this->info('JWT authentication routes added.');
     }
 
     protected function addJwtController()
