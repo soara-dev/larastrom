@@ -29,33 +29,11 @@ class InstallCommand extends Command
         $this->info('Installing JWT Auth package...');
         $this->runProcess(['composer', 'require', 'tymon/jwt-auth']);
         $this->publishVendorConfig('Tymon\JWTAuth\Providers\LaravelServiceProvider');
-        $this->addJwtGuardConfiguration();
-        $this->addJwtRoutes();
         $this->addJwtController();
         $this->info('JWT configuration published.');
     }
 
-    protected function addJwtGuardConfiguration()
-    {
-        // $authConfigPath = config_path('auth.php');
 
-        // if (File::exists($authConfigPath)) {
-        //     $authConfigContent = File::get($authConfigPath);
-
-        //     // Check if the 'api' guard already exists
-        //     if (strpos($authConfigContent, "'api' => [") === false) {
-        //         // Add the JWT guard configuration
-        //         $guardConfig = "\n    'api' => [\n        'driver' => 'jwt',\n        'provider' => 'users',\n    ],\n";
-        //         $authConfigContent = preg_replace("/'guards' => \[\n/", "'guards' => [\n$guardConfig", $authConfigContent);
-        //         File::put($authConfigPath, $authConfigContent);
-        //         $this->info('JWT guard configuration added to config/auth.php.');
-        //     } else {
-        //         $this->info('JWT guard configuration already exists in config/auth.php. Skipping addition.');
-        //     }
-        // } else {
-        //     $this->error('auth.php configuration file not found.');
-        // }
-    }
 
     protected function installSpatiePermissions()
     {
@@ -64,7 +42,6 @@ class InstallCommand extends Command
         $this->publishVendorConfig('Spatie\Permission\PermissionServiceProvider');
         Artisan::call('migrate');
         $this->info('Spatie Permissions migrations completed.');
-        $this->addSpatieRoutes();
         $this->addSpatieController();
     }
 
@@ -90,14 +67,6 @@ class InstallCommand extends Command
         ]);
     }
 
-    protected function addSpatieRoutes()
-    {
-        $routesPath = base_path('routes/api.php');
-        $this->checkFileExists($routesPath, 'Routes file not found.');
-
-        $this->appendSpatieRoutes($routesPath);
-        $this->info('Spatie Permissions routes added and JWT middleware registered.');
-    }
     protected function addJwtMiddleware()
     {
         $middlewarePath = app_path('Http/Middleware/JwtVerify.php');
@@ -114,16 +83,6 @@ class InstallCommand extends Command
         } else {
             $this->info('JWT Verify middleware already exists. Skipping creation.');
         }
-    }
-    protected function registerJwtMiddleware()
-    {
-        // $appPath = base_path('bootstrap/app.php');
-        // $this->checkFileExists($appPath, 'bootstrap/app.php not found.');
-
-        // $appContent = File::get($appPath);
-        // $this->addUseStatement($appContent, "use App\\Http\\Middleware\\JwtVerify;");
-        // $this->addMiddlewareAlias($appContent, "'jwt.verify' => JwtVerify::class");
-        // File::put($appPath, $appContent);
     }
 
     protected function addMiddlewareAlias(&$content, $alias)
@@ -251,19 +210,6 @@ class InstallCommand extends Command
         }
     }
 
-    protected function addJwtRoutes()
-    {
-        $routesPath = base_path('routes/api.php');
-        $this->checkFileExists($routesPath, 'routes/api.php not found.');
-        $this->appendJwtRoutes($routesPath);
-    }
-
-    protected function appendJwtRoutes($routesPath)
-    {
-        // $routeContent = file_get_contents(realpath(__DIR__ . '/../../../stub/RouteContent.stub'));
-        // File::append($routesPath, $routeContent);
-        // $this->info('JWT authentication routes added.');
-    }
 
     protected function addJwtController()
     {
