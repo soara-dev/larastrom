@@ -29,7 +29,8 @@ Add the `LarastromServiceProvider` to your `bootstrap/providers.php` file:
 ```php
 return [
     App\Providers\AppServiceProvider::class,
-    Soara\Larastrom\LarastromServiceProvider::class // add this line
+    Soara\Larastrom\LarastromServiceProvider::class, // add this line
+    Tymon\JWTAuth\Providers\LaravelServiceProvider::class // add this line
 ];
 ```
 
