@@ -22,10 +22,12 @@ trait WithBuilder
 
                         if (str_contains($key, '.')) {
                             $parts = explode('.', $key);
-                            $column = array_pop($parts);
-                            $relations = array_map(fn($part) => Str::camel($part), $parts);
+                            $field = array_pop($parts);
+                            $relation = implode('.', $parts);
 
-                            $q->orWhereHasNested($relations, $column, $value);
+                            $q->whereHas($relation, function ($query) use ($field, $value) {
+                                $query->where($field, 'like', '%' . $value . '%');
+                            });
                         } else {
                             $q->orWhere($key, 'like', '%' . $value . '%');
                         }
@@ -82,18 +84,5 @@ trait WithBuilder
         }
 
         return $res;
-    }
-
-    protected static function applyNestedOrWhereHas($query, $relations, $column, $value)
-    {
-        $relation = array_shift($relations);
-
-        $query->orWhereHas($relation, function ($q) use ($relations, $column, $value) {
-            if (count($relations)) {
-                self::applyNestedOrWhereHas($q, $relations, $column, $value);
-            } else {
-                $q->where($column, 'like', '%' . $value . '%');
-            }
-        });
     }
 }
