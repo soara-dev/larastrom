@@ -23,7 +23,8 @@ trait WithBuilder
                         if (str_contains($key, '.')) {
                             $parts = explode('.', $key);
                             $field = array_pop($parts);
-                            $relation = implode('.', $parts);
+                            $camelRelations = array_map(fn($part) => Str::camel($part), $parts);
+                            $relation = implode('.', $camelRelations);
 
                             $q->whereHas($relation, function ($query) use ($field, $value) {
                                 $query->where($field, 'like', '%' . $value . '%');
