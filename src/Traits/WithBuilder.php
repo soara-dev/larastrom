@@ -5,19 +5,31 @@ namespace Soara\Larastrom\Traits;
 trait WithBuilder
 {
     public function scopeAllowSearch($query)
-    {
-        if (!request()->searchField) return;
-        $query->where(function ($q) {
-            foreach (request()->searchField ?? [] as $key => $value) {
-                if (!is_null($value) && $value !== '') {
-                    $key = $key === '_index' ? 'id' : $key;
+{
+    $searchFields = request()->searchField;
+
+    if (!$searchFields || !is_array($searchFields)) return $query;
+
+    $query->where(function ($q) use ($searchFields) {
+        foreach ($searchFields as $key => $value) {
+            if (!is_null($value) && $value !== '') {
+                $key = $key === '_index' ? 'id' : $key;
+
+                if (str_contains($key, '.')) {
+                    [$relation, $column] = explode('.', $key, 2);
+                    $q->orWhereHas($relation, function ($subQuery) use ($column, $value) {
+                        $subQuery->where($column, 'like', '%' . $value . '%');
+                    });
+                } else {
                     $q->orWhere($key, 'like', '%' . $value . '%');
                 }
             }
-        });
+        }
+    });
 
-        return $query;
-    }
+    return $query;
+}
+
 
     public function scopeAllowOrder($query)
     {
