@@ -2,33 +2,40 @@
 
 namespace Soara\Larastrom\Traits;
 
+use Illuminate\Support\Str;
+
 trait WithBuilder
 {
     public function scopeAllowSearch($query)
-{
-    $searchFields = request()->searchField;
+    {
+        $searchFields = request()->searchField;
 
-    if (!$searchFields || !is_array($searchFields)) return $query;
+        if (!$searchFields || !is_array($searchFields)) return $query;
 
-    $query->where(function ($q) use ($searchFields) {
-        foreach ($searchFields as $key => $value) {
-            if (!is_null($value) && $value !== '') {
-                $key = $key === '_index' ? 'id' : $key;
+        $query->where(function ($q) use ($searchFields) {
+            foreach ($searchFields as $key => $value) {
+                if (!is_null($value) && $value !== '') {
+                    $key = $key === '_index' ? 'id' : $key;
 
-                if (str_contains($key, '.')) {
-                    [$relation, $column] = explode('.', $key, 2);
-                    $q->orWhereHas($relation, function ($subQuery) use ($column, $value) {
-                        $subQuery->where($column, 'like', '%' . $value . '%');
-                    });
-                } else {
-                    $q->orWhere($key, 'like', '%' . $value . '%');
+                    if (!is_null($value) && $value !== '') {
+                        $key = $key === '_index' ? 'id' : $key;
+
+                        if (str_contains($key, '.')) {
+                            $parts = explode('.', $key);
+                            $column = array_pop($parts);
+                            $relations = array_map(fn($part) => Str::camel($part), $parts);
+
+                            $q->orWhereHasNested($relations, $column, $value);
+                        } else {
+                            $q->orWhere($key, 'like', '%' . $value . '%');
+                        }
+                    }
                 }
             }
-        }
-    });
+        });
 
-    return $query;
-}
+        return $query;
+    }
 
 
     public function scopeAllowOrder($query)
@@ -75,5 +82,18 @@ trait WithBuilder
         }
 
         return $res;
+    }
+
+    protected static function applyNestedOrWhereHas($query, $relations, $column, $value)
+    {
+        $relation = array_shift($relations);
+
+        $query->orWhereHas($relation, function ($q) use ($relations, $column, $value) {
+            if (count($relations)) {
+                self::applyNestedOrWhereHas($q, $relations, $column, $value);
+            } else {
+                $q->where($column, 'like', '%' . $value . '%');
+            }
+        });
     }
 }
