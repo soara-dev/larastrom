@@ -10,6 +10,7 @@ trait WithBuilder
         $query->where(function ($q) {
             foreach (request()->searchField ?? [] as $key => $value) {
                 if (!is_null($value) && $value !== '') {
+                    $key = $key === '_index' ? 'id' : $key;
                     $q->orWhere($key, 'like', '%' . $value . '%');
                 }
             }
